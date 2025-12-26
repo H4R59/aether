@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find your soulmate & love percentage | AETHER</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@200;900&family=Space+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #e2c999;
+            --sky-dark: #02040a;
+            --comet-tail: rgba(255, 255, 255, 0.4);
+            --chaos-red: #ff003c;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--sky-dark);
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* --- THE COMET SKY --- */
+        #sky-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #0a1128 0%, #02040a 100%);
+        }
+
+        /* --- LUXURY GLASS CARD --- */
+        .destiny-card {
+            width: 440px;
+            padding: 70px 50px;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(226, 201, 153, 0.15);
+            border-radius: 4px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+            transition: 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .header h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 2.4rem;
+            letter-spacing: 10px;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            text-shadow: 0 0 20px rgba(226, 201, 153, 0.3);
+        }
+
+        .tagline {
+            font-size: 0.55rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            opacity: 0.5;
+            margin-bottom: 50px;
+        }
+
+        /* --- INPUTS --- */
+        .input-suite { margin-bottom: 40px; }
+        
+        input {
+            width: 100%;
+            padding: 18px;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(226, 201, 153, 0.2);
+            color: #fff;
+            text-align: center;
+            font-size: 0.8rem;
+            letter-spacing: 4px;
+            outline: none;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        input:focus { border-color: var(--gold); background: rgba(226, 201, 153, 0.03); }
+
+        .btn-trigger {
+            width: 100%;
+            padding: 22px;
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.65rem;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.5s;
+            margin-top: 10px;
+            font-weight: 700;
+        }
+
+        .btn-trigger:hover {
+            background: var(--gold);
+            color: #000;
+            box-shadow: 0 0 50px rgba(226, 201, 153, 0.4);
+        }
+
+        /* --- LOADING PORTAL --- */
+        #portal {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: #000;
+            z-index: 100;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .celestial-loader {
+            width: 60px; height: 60px;
+            border: 2px solid var(--gold);
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* --- CHAOS & ROAST STYLES --- */
+        .roast-primary {
+            font-family: 'Cinzel', serif;
+            font-size: 1.8rem;
+            line-height: 1.4;
+            color: #fff;
+            text-shadow: 0 0 10px var(--chaos-red);
+        }
+
+        .cry-overlay {
+            position: fixed;
+            font-size: 4rem;
+            pointer-events: none;
+            z-index: 1000;
+            animation: fall 2s linear forwards;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+
+        .emergency-banner {
+            position: fixed;
+            top: -100px;
+            width: 100%;
+            background: var(--chaos-red);
+            padding: 15px;
+            text-align: center;
+            font-weight: 900;
+            font-size: 1.2rem;
+            z-index: 2000;
+            transition: 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translate(0,0); }
+            25% { transform: translate(-10px, 10px); }
+            75% { transform: translate(10px, -10px); }
+        }
+
+        footer { position: fixed; bottom: 30px; font-size: 0.5rem; letter-spacing: 8px; opacity: 0.2; }
+    </style>
+</head>
+<body>
+
+    <canvas id="sky-canvas"></canvas>
+    <div id="alarm" class="emergency-banner">🚨 CRITICAL FAILURE: ZERO ATTRACTION DETECTED 🚨</div>
+
+    <div class="destiny-card" id="main-card">
+        <div class="header">
+            <h1>Aether</h1>
+            <p class="tagline">Find your soulmate & love percentage</p>
+        </div>
+
+        <div class="input-suite">
+            <input type="text" id="mName" placeholder="Enter Masculine Identity">
+            <input type="text" id="fName" placeholder="Enter Feminine Identity">
+        </div>
+
+        <button class="btn-trigger" onclick="analyze('soulmate')">Establish Soulmate Bond</button>
+        <button class="btn-trigger" onclick="analyze('love')">Quantify Devotion %</button>
+
+        <div id="portal">
+            <div class="celestial-loader"></div>
+            <p style="color:var(--gold); font-size: 0.6rem; letter-spacing: 4px; margin-top: 25px;" id="status-text">Synchronizing Astral Planes...</p>
+        </div>
+    </div>
+
+    <footer>BY DIVYA</footer>
+
+    <script>
+        // --- HIGH-END COMET ENGINE ---
+        const canvas = document.getElementById('sky-canvas');
+        const ctx = canvas.getContext('2d');
+        let comets = [];
+
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.onresize = resize; resize();
+
+        class Comet {
+            constructor() { this.init(); }
+            init() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height * 0.5;
+                this.length = Math.random() * 80 + 20;
+                this.speed = Math.random() * 10 + 5;
+                this.opacity = Math.random();
+            }
+            draw() {
+                ctx.beginPath();
+                let gradient = ctx.createLinearGradient(this.x, this.y, this.x - this.length, this.y - this.length);
+                gradient.addColorStop(0, `rgba(226, 201, 153, ${this.opacity})`);
+                gradient.addColorStop(1, 'transparent');
+                ctx.strokeStyle = gradient;
+                ctx.lineWidth = 2;
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(this.x - this.length, this.y - this.length);
+                ctx.stroke();
+                this.x += this.speed;
+                this.y += this.speed;
+                if (this.x > canvas.width || this.y > canvas.height) this.init();
+            }
+        }
+
+        for(let i=0; i<15; i++) comets.push(new Comet());
+
+        function animate() {
+            ctx.fillStyle = 'rgba(2, 4, 10, 0.2)'; // Tail effect
+            ctx.fillRect(0,0, canvas.width, canvas.height);
+            comets.forEach(c => c.draw());
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // --- THE TRAP ---
+        function analyze(type) {
+            const m = document.getElementById('mName').value;
+            const f = document.getElementById('fName').value;
+            if(!m || !f) return;
+
+            const portal = document.getElementById('portal');
+            const status = document.getElementById('status-text');
+            portal.style.display = 'flex';
+
+            const steps = [
+                "Reading Pulse Frequencies...",
+                "Consulting Oracle Archives...",
+                "Mapping Karmic Trajectories...",
+                "FINALIZING DECREE..."
+            ];
+
+            let i = 0;
+            const timer = setInterval(() => {
+                if(i < steps.length) {
+                    status.innerText = steps[i];
+                    i++;
+                } else {
+                    clearInterval(timer);
+                    reveal(type);
+                }
+            }, 800);
+        }
+
+        function reveal(mode) {
+            const portal = document.getElementById('portal');
+            portal.innerHTML = `
+                <div class="roast-primary" id="roast-target"></div>
+                <p id="sub-roast" style="color:var(--gold); font-size:0.7rem; margin-top:20px;"></p>
+            `;
+
+            const target = document.getElementById('roast-target');
+            const sub = document.getElementById('sub-roast');
+
+            if(mode === 'soulmate') {
+                target.innerHTML = "APKI JINDGI ME <br> NOII HAI 😂🤣";
+                sub.innerText = "HAI TO SIRF KATWANA HAI";
+            } else {
+                target.innerHTML = "APP LWDE HO JO <br> YEH SEARCH KR RHE HO 🤡";
+                sub.innerText = "CLOWN DETECTION: 100%";
+            }
+
+            triggerTotalChaos();
+        }
+
+        function triggerTotalChaos() {
+            const card = document.getElementById('main-card');
+            const alarm = document.getElementById('alarm');
+            
+            // Shake and Red Strobe
+            card.style.animation = "shake 0.1s infinite";
+            card.style.borderColor = "var(--chaos-red)";
+            alarm.style.top = "0";
+
+            // Spawn Crying Emojis Everywhere
+            setInterval(() => {
+                const cry = document.createElement('div');
+                cry.className = 'cry-overlay';
+                cry.innerText = Math.random() > 0.5 ? "😭" : "🤡";
+                cry.style.left = Math.random() * 100 + "vw";
+                cry.style.top = "-50px";
+                document.body.appendChild(cry);
+                
+                // Cleanup
+                setTimeout(() => cry.remove(), 2000);
+            }, 100);
+
+            // Flicker Background
+            setInterval(() => {
+                document.body.style.background = Math.random() > 0.8 ? '#300' : '#02040a';
+            }, 50);
+        }
+    </script>
+</body>
+</html>
